@@ -93,6 +93,7 @@ func (d *DB) ListMemos(ctx context.Context, find *store.FindMemo) ([]*store.Memo
 		"`memo`.`updated_ts` AS `updated_ts`",
 		"`memo`.`row_status` AS `row_status`",
 		"`memo`.`visibility` AS `visibility`",
+		"`memo`.`summary` AS `summary`",
 		"IFNULL(`memo_organizer`.`pinned`, 0) AS `pinned`",
 		"`memo_relation`.`related_memo_id` AS `parent_id`",
 	}
@@ -129,6 +130,7 @@ func (d *DB) ListMemos(ctx context.Context, find *store.FindMemo) ([]*store.Memo
 			&memo.UpdatedTs,
 			&memo.RowStatus,
 			&memo.Visibility,
+			&memo.Summary,
 			&memo.Pinned,
 			&memo.ParentID,
 		}
@@ -167,6 +169,9 @@ func (d *DB) UpdateMemo(ctx context.Context, update *store.UpdateMemo) error {
 	}
 	if v := update.Visibility; v != nil {
 		set, args = append(set, "`visibility` = ?"), append(args, *v)
+	}
+	if v := update.Summary; v != nil {
+		set, args = append(set, "`summary` = ?"), append(args, *v)
 	}
 	args = append(args, update.ID)
 

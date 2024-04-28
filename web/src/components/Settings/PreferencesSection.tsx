@@ -8,6 +8,7 @@ import { convertVisibilityFromString, convertVisibilityToString } from "@/utils/
 import AppearanceSelect from "../AppearanceSelect";
 import LocaleSelect from "../LocaleSelect";
 import VisibilityIcon from "../VisibilityIcon";
+import LLMSection from "./LLMSection";
 import WebhookSection from "./WebhookSection";
 
 const PreferencesSection = () => {
@@ -82,6 +83,10 @@ const PreferencesSection = () => {
       <Divider className="!my-3" />
 
       <WebhookSection />
+
+      <Divider className="!my-3" />
+
+      <LLMSection />
     </div>
   );
 };

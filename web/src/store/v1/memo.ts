@@ -96,6 +96,19 @@ export const useMemoStore = create(
       delete memoMap[name];
       set({ memoMapByName: memoMap });
     },
+    createSummary: async (name: string) => {
+      const { memo } = await memoServiceClient.createSummary({
+        name,
+      });
+
+      if (!memo) {
+        throw new Error("Failed to create summary for memo");
+      }
+
+      const memoMap = get().memoMapByName;
+      memoMap[memo.name] = memo;
+      set({ memoMapByName: memoMap });
+    },
   })),
 );
 

@@ -88,6 +88,10 @@ func convertWorkspaceSettingFromStore(setting *storepb.WorkspaceSetting) *apiv2p
 		workspaceSetting.Value = &apiv2pb.WorkspaceSetting_MemoRelatedSetting{
 			MemoRelatedSetting: convertWorkspaceMemoRelatedSettingFromStore(setting.GetMemoRelatedSetting()),
 		}
+	case *storepb.WorkspaceSetting_LlmSetting:
+		workspaceSetting.Value = &apiv2pb.WorkspaceSetting_LlmSetting{
+			LlmSetting: convertWorkspaceLlmSettingFromStore(setting.GetLlmSetting()),
+		}
 	}
 	return workspaceSetting
 }
@@ -112,6 +116,10 @@ func convertWorkspaceSettingToStore(setting *apiv2pb.WorkspaceSetting) *storepb.
 	case storepb.WorkspaceSettingKey_WORKSPACE_SETTING_MEMO_RELATED:
 		workspaceSetting.Value = &storepb.WorkspaceSetting_MemoRelatedSetting{
 			MemoRelatedSetting: convertWorkspaceMemoRelatedSettingToStore(setting.GetMemoRelatedSetting()),
+		}
+	case storepb.WorkspaceSettingKey_WORKSPACE_SETTING_LLM:
+		workspaceSetting.Value = &storepb.WorkspaceSetting_LlmSetting{
+			LlmSetting: convertWorkspaceLlmSettingToStore(setting.GetLlmSetting()),
 		}
 	}
 	return workspaceSetting
@@ -197,6 +205,19 @@ func convertWorkspaceMemoRelatedSettingFromStore(setting *storepb.WorkspaceMemoR
 	}
 }
 
+func convertWorkspaceLlmSettingFromStore(setting *storepb.WorkspaceLLMSetting) *apiv2pb.WorkspaceLLMSetting {
+	if setting == nil {
+		return nil
+	}
+	return &apiv2pb.WorkspaceLLMSetting{
+		Enabled:  setting.Enabled,
+		Endpoint: setting.Endpoint,
+		Request:  setting.Request,
+		Prompt:   setting.Prompt,
+		Model:    setting.Model,
+	}
+}
+
 func convertWorkspaceMemoRelatedSettingToStore(setting *apiv2pb.WorkspaceMemoRelatedSetting) *storepb.WorkspaceMemoRelatedSetting {
 	if setting == nil {
 		return nil
@@ -204,5 +225,18 @@ func convertWorkspaceMemoRelatedSettingToStore(setting *apiv2pb.WorkspaceMemoRel
 	return &storepb.WorkspaceMemoRelatedSetting{
 		DisallowPublicVisible: setting.DisallowPublicVisible,
 		DisplayWithUpdateTime: setting.DisplayWithUpdateTime,
+	}
+}
+
+func convertWorkspaceLlmSettingToStore(setting *apiv2pb.WorkspaceLLMSetting) *storepb.WorkspaceLLMSetting {
+	if setting == nil {
+		return nil
+	}
+	return &storepb.WorkspaceLLMSetting{
+		Enabled:  setting.Enabled,
+		Endpoint: setting.Endpoint,
+		Request:  setting.Request,
+		Prompt:   setting.Prompt,
+		Model:    setting.Model,
 	}
 }

@@ -1,4 +1,4 @@
-import { Tooltip } from "@mui/joy";
+import { IconButton, Tooltip } from "@mui/joy";
 import classNames from "classnames";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -16,6 +16,7 @@ import MemoContent from "./MemoContent";
 import MemoReactionistView from "./MemoReactionListView";
 import MemoRelationListView from "./MemoRelationListView";
 import MemoResourceListView from "./MemoResourceListView";
+import MemoSummaryView from "./MemoSummaryView";
 import showPreviewImageDialog from "./PreviewImageDialog";
 import ReactionSelector from "./ReactionSelector";
 import UserAvatar from "./UserAvatar";
@@ -39,6 +40,7 @@ const MemoView: React.FC<Props> = (props: Props) => {
   const userStore = useUserStore();
   const user = useCurrentUser();
   const [creator, setCreator] = useState(userStore.getUserByName(memo.creator));
+  const [showSummary, setShowSummary] = useState(false);
   const memoContainerRef = useRef<HTMLDivElement>(null);
   const referencedMemos = memo.relations.filter((relation) => relation.type === MemoRelation_Type.REFERENCE);
   const commentAmount = memo.relations.filter(
@@ -123,6 +125,13 @@ const MemoView: React.FC<Props> = (props: Props) => {
               </Tooltip>
             )}
             {currentUser && <ReactionSelector className="border-none w-auto h-auto" memo={memo} />}
+            <IconButton
+              onClick={() => {
+                setShowSummary(!showSummary);
+              }}
+            >
+              <Icon.Sparkles className="w-4 h-4 mx-auto text-gray-500 dark:text-gray-400" />
+            </IconButton>
           </div>
           {!isInMemoDetailPage && (
             <Link
@@ -145,6 +154,7 @@ const MemoView: React.FC<Props> = (props: Props) => {
           {!readonly && <MemoActionMenu className="-ml-1" memo={memo} hiddenActions={props.showPinned ? [] : ["pin"]} />}
         </div>
       </div>
+      {showSummary && <MemoSummaryView memo={memo} />}
       <MemoContent
         key={`${memo.name}-${memo.updateTime}`}
         memoName={memo.name}

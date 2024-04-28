@@ -61,6 +61,7 @@ message WorkspaceSetting {
     WorkspaceGeneralSetting general_setting = 2;
     WorkspaceStorageSetting storage_setting = 3;
     WorkspaceMemoRelatedSetting memo_related_setting = 4;
+    WorkspaceLLMSetting llm_setting = 5;
   }
 }
 
@@ -114,4 +115,12 @@ message WorkspaceMemoRelatedSetting {
   bool disallow_public_visible = 1;
   // display_with_update_time orders and displays memo with update time.
   bool display_with_update_time = 2;
+}
+
+message WorkspaceLLMSetting {
+  bool enabled = 1;
+  string endpoint = 2;
+  string request = 3;
+  string prompt = 4;
+  string model = 5;
 }

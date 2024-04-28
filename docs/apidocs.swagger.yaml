@@ -937,6 +937,8 @@ paths:
                 $ref: '#/definitions/apiv2WorkspaceStorageSetting'
               memoRelatedSetting:
                 $ref: '#/definitions/apiv2WorkspaceMemoRelatedSetting'
+              llmSetting:
+                $ref: '#/definitions/apiv2WorkspaceLLMSetting'
             title: setting is the setting to update.
       tags:
         - WorkspaceSettingService
@@ -1102,6 +1104,8 @@ paths:
                   type: object
                   $ref: '#/definitions/v2Reaction'
                 readOnly: true
+              summary:
+                type: string
       tags:
         - MemoService
   /api/v2/{name_1}:
@@ -1631,6 +1635,29 @@ paths:
           pattern: users/[^/]+
       tags:
         - UserService
+  /api/v2/{name}/summary:
+    post:
+      operationId: MemoService_CreateSummary
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v2CreateSummaryResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: name
+          description: |-
+            The name of the memo.
+            Format: memos/{id}
+          in: path
+          required: true
+          type: string
+          pattern: memos/[^/]+
+      tags:
+        - MemoService
   /api/v2/{resource.name}:
     patch:
       summary: UpdateResource updates a resource.
@@ -2021,6 +2048,19 @@ definitions:
       customProfile:
         $ref: '#/definitions/apiv2WorkspaceCustomProfile'
         description: custom_profile is the custom profile.
+  apiv2WorkspaceLLMSetting:
+    type: object
+    properties:
+      enabled:
+        type: boolean
+      endpoint:
+        type: string
+      request:
+        type: string
+      prompt:
+        type: string
+      model:
+        type: string
   apiv2WorkspaceMemoRelatedSetting:
     type: object
     properties:
@@ -2044,6 +2084,8 @@ definitions:
         $ref: '#/definitions/apiv2WorkspaceStorageSetting'
       memoRelatedSetting:
         $ref: '#/definitions/apiv2WorkspaceMemoRelatedSetting'
+      llmSetting:
+        $ref: '#/definitions/apiv2WorkspaceLLMSetting'
   apiv2WorkspaceStorageSetting:
     type: object
     properties:
@@ -2167,6 +2209,11 @@ definitions:
     properties:
       storage:
         $ref: '#/definitions/apiv2Storage'
+  v2CreateSummaryResponse:
+    type: object
+    properties:
+      memo:
+        $ref: '#/definitions/v2Memo'
   v2CreateUserAccessTokenResponse:
     type: object
     properties:
@@ -2520,6 +2567,8 @@ definitions:
           type: object
           $ref: '#/definitions/v2Reaction'
         readOnly: true
+      summary:
+        type: string
   v2MemoRelation:
     type: object
     properties:

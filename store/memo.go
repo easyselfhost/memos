@@ -50,6 +50,9 @@ type Memo struct {
 	// Composed fields
 	Pinned   bool
 	ParentID *int32
+
+	// LLM generated summary
+	Summary string
 }
 
 type FindMemo struct {
@@ -86,6 +89,7 @@ type UpdateMemo struct {
 	RowStatus  *RowStatus
 	Content    *string
 	Visibility *Visibility
+	Summary    *string
 }
 
 type DeleteMemo struct {

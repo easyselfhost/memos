@@ -37,6 +37,8 @@ func (s *Store) UpsertWorkspaceSetting(ctx context.Context, upsert *storepb.Work
 		valueBytes, err = protojson.Marshal(upsert.GetStorageSetting())
 	} else if upsert.Key == storepb.WorkspaceSettingKey_WORKSPACE_SETTING_MEMO_RELATED {
 		valueBytes, err = protojson.Marshal(upsert.GetMemoRelatedSetting())
+	} else if upsert.Key == storepb.WorkspaceSettingKey_WORKSPACE_SETTING_LLM {
+		valueBytes, err = protojson.Marshal(upsert.GetLlmSetting())
 	} else {
 		return nil, errors.Errorf("unsupported workspace setting key: %v", upsert.Key)
 	}
@@ -197,6 +199,12 @@ func convertWorkspaceSettingFromRaw(workspaceSettingRaw *WorkspaceSetting) (*sto
 			return nil, err
 		}
 		workspaceSetting.Value = &storepb.WorkspaceSetting_MemoRelatedSetting{MemoRelatedSetting: memoRelatedSetting}
+	case storepb.WorkspaceSettingKey_WORKSPACE_SETTING_LLM.String():
+		llmSetting := &storepb.WorkspaceLLMSetting{}
+		if err := protojsonUnmarshaler.Unmarshal([]byte(workspaceSettingRaw.Value), llmSetting); err != nil {
+			return nil, err
+		}
+		workspaceSetting.Value = &storepb.WorkspaceSetting_LlmSetting{LlmSetting: llmSetting}
 	default:
 		return nil, errors.Errorf("unsupported workspace setting key: %v", workspaceSettingRaw.Name)
 	}

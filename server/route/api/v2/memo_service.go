@@ -20,6 +20,7 @@ import (
 	"github.com/usememos/memos/plugin/webhook"
 	apiv2pb "github.com/usememos/memos/proto/gen/api/v2"
 	storepb "github.com/usememos/memos/proto/gen/store"
+	llmsummarizer "github.com/usememos/memos/server/service/llm_summarizer"
 	"github.com/usememos/memos/store"
 )
 
@@ -523,6 +524,50 @@ func (s *APIV2Service) ExportMemos(ctx context.Context, request *apiv2pb.ExportM
 	}, nil
 }
 
+func (s *APIV2Service) CreateSummary(ctx context.Context, request *apiv2pb.CreateSummaryRequest) (*apiv2pb.CreateSummaryResponse, error) {
+	id, err := ExtractMemoIDFromName(request.Name)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid memo name: %v", err)
+	}
+	memo, err := s.Store.GetMemo(ctx, &store.FindMemo{
+		ID: &id,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if memo == nil {
+		return nil, status.Errorf(codes.NotFound, "memo not found")
+	}
+
+	l, err := llmsummarizer.NewLLMSummarizer(s.Store)
+	if err != nil {
+		return nil, err
+	}
+
+	summary, err := l.CreateSummary(ctx, memo)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.Store.UpdateMemo(ctx, &store.UpdateMemo{
+		ID:      memo.ID,
+		Summary: &summary,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	memo.Summary = summary
+	pbMemo, err := s.convertMemoFromStore(ctx, memo)
+	if err != nil {
+		return nil, err
+	}
+
+	return &apiv2pb.CreateSummaryResponse{
+		Memo: pbMemo,
+	}, nil
+}
+
 func (s *APIV2Service) convertMemoFromStore(ctx context.Context, memo *store.Memo) (*apiv2pb.Memo, error) {
 	displayTs := memo.CreatedTs
 	workspaceMemoRelatedSetting, err := s.Store.GetWorkspaceMemoRelatedSetting(ctx)
@@ -569,6 +614,7 @@ func (s *APIV2Service) convertMemoFromStore(ctx context.Context, memo *store.Mem
 		Relations:   listMemoRelationsResponse.Relations,
 		Resources:   listMemoResourcesResponse.Resources,
 		Reactions:   listMemoReactionsResponse.Reactions,
+		Summary:     memo.Summary,
 	}, nil
 }
 

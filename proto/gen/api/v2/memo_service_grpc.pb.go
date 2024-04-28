@@ -36,6 +36,7 @@ const (
 	MemoService_ListMemoReactions_FullMethodName  = "/memos.api.v2.MemoService/ListMemoReactions"
 	MemoService_UpsertMemoReaction_FullMethodName = "/memos.api.v2.MemoService/UpsertMemoReaction"
 	MemoService_DeleteMemoReaction_FullMethodName = "/memos.api.v2.MemoService/DeleteMemoReaction"
+	MemoService_CreateSummary_FullMethodName      = "/memos.api.v2.MemoService/CreateSummary"
 )
 
 // MemoServiceClient is the client API for MemoService service.
@@ -76,6 +77,7 @@ type MemoServiceClient interface {
 	UpsertMemoReaction(ctx context.Context, in *UpsertMemoReactionRequest, opts ...grpc.CallOption) (*UpsertMemoReactionResponse, error)
 	// DeleteMemoReaction deletes a reaction for a memo.
 	DeleteMemoReaction(ctx context.Context, in *DeleteMemoReactionRequest, opts ...grpc.CallOption) (*DeleteMemoReactionResponse, error)
+	CreateSummary(ctx context.Context, in *CreateSummaryRequest, opts ...grpc.CallOption) (*CreateSummaryResponse, error)
 }
 
 type memoServiceClient struct {
@@ -239,6 +241,15 @@ func (c *memoServiceClient) DeleteMemoReaction(ctx context.Context, in *DeleteMe
 	return out, nil
 }
 
+func (c *memoServiceClient) CreateSummary(ctx context.Context, in *CreateSummaryRequest, opts ...grpc.CallOption) (*CreateSummaryResponse, error) {
+	out := new(CreateSummaryResponse)
+	err := c.cc.Invoke(ctx, MemoService_CreateSummary_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MemoServiceServer is the server API for MemoService service.
 // All implementations must embed UnimplementedMemoServiceServer
 // for forward compatibility
@@ -277,6 +288,7 @@ type MemoServiceServer interface {
 	UpsertMemoReaction(context.Context, *UpsertMemoReactionRequest) (*UpsertMemoReactionResponse, error)
 	// DeleteMemoReaction deletes a reaction for a memo.
 	DeleteMemoReaction(context.Context, *DeleteMemoReactionRequest) (*DeleteMemoReactionResponse, error)
+	CreateSummary(context.Context, *CreateSummaryRequest) (*CreateSummaryResponse, error)
 	mustEmbedUnimplementedMemoServiceServer()
 }
 
@@ -334,6 +346,9 @@ func (UnimplementedMemoServiceServer) UpsertMemoReaction(context.Context, *Upser
 }
 func (UnimplementedMemoServiceServer) DeleteMemoReaction(context.Context, *DeleteMemoReactionRequest) (*DeleteMemoReactionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteMemoReaction not implemented")
+}
+func (UnimplementedMemoServiceServer) CreateSummary(context.Context, *CreateSummaryRequest) (*CreateSummaryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSummary not implemented")
 }
 func (UnimplementedMemoServiceServer) mustEmbedUnimplementedMemoServiceServer() {}
 
@@ -654,6 +669,24 @@ func _MemoService_DeleteMemoReaction_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MemoService_CreateSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateSummaryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemoServiceServer).CreateSummary(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MemoService_CreateSummary_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemoServiceServer).CreateSummary(ctx, req.(*CreateSummaryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MemoService_ServiceDesc is the grpc.ServiceDesc for MemoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -728,6 +761,10 @@ var MemoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteMemoReaction",
 			Handler:    _MemoService_DeleteMemoReaction_Handler,
+		},
+		{
+			MethodName: "CreateSummary",
+			Handler:    _MemoService_CreateSummary_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
